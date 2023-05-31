@@ -172,5 +172,44 @@ else:
         validation_set=0.1,
         show_metric=True,
         batch_size=128,
-        n_epoch=1000)
+        n_epoch=1000,
+    )
     model.save("Entrenamiento/model.tflearn")
+
+# PARTE 4
+
+
+def response(texto):
+    if texto == "duerme":
+        print("Ha sido un gusto, vuelve pronto amigo")
+        return False
+    else:
+        bucket = [0 for _ in range(len(all_words))]
+        processed_sentence = nltk.word_tokenize(texto)
+        processed_sentence = [
+            stemmer.stem(palabra.lower()) for palabra in processed_sentence
+        ]
+        for individual_word in processed_sentence:
+            for i, palabra in enumerate(all_words):
+                if palabra == individual_word:
+                    bucket[i] = 1
+        results = model.predict([numpy.array(bucket)])
+        index_results = numpy.argmax(results)
+        max = results[0][index_results]
+
+        target = tags[index_results]
+
+        for tagAux in database["intents"]:
+            if tagAux["tag"] == target:
+                answer = tagAux["responses"]
+                answer = random.choice(answer)
+
+        print(answer)
+        return True
+
+
+print("HABLA CONMIGO !!")
+bool = True
+while bool == True:
+    texto = input()
+    bool = response(texto)
