@@ -178,7 +178,6 @@ else:
 
 # PARTE 4
 
-
 def response(texto):
     if texto == "duerme":
         print("Ha sido un gusto, vuelve pronto amigo")
