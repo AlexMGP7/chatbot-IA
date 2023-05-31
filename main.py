@@ -40,7 +40,7 @@ print("Primera parte correcta")
 
 # PARTE 2
 
-dload.git_clone("https://github.com/boomcrash/data_bot.git")
+# dload.git_clone("https://github.com/boomcrash/data_bot.git")
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 dir_path = dir_path.replace("\\", "//")
@@ -140,3 +140,37 @@ except:
 
     with open("Entrenamiento/brain.pickle", "wb") as pickleBrain:
         pickle.dump((all_words, tags, training, exit), pickleBrain)
+
+    print("Segunda parte correcta")
+
+# PARTE 3
+
+tensorflow.compat.v1.reset_default_graph()
+tflearn.init_graph(num_cores=8, gpu_memory_fraction=0.5)
+
+# Creamos la red neuronal
+net = tflearn.input_data(shape=[None, len(training[0])])
+# Redes intermedias
+net = tflearn.fully_connected(net, 100, activation="Relu")
+net = tflearn.fully_connected(net, 50)
+net = tflearn.dropout(net, 0.5)
+# Neuronas salida
+net = tflearn.fully_connected(net, len(exit[0]), activation="softmax")
+# Red completada
+net = tflearn.regression(
+    net, optimizer="adam", learning_rate=0.001, loss="categorical_crossentropy"
+)
+model = tflearn.DNN(net)
+
+if os.path.isfile(dir_path + "/Entrenamiento/model.tflearn.index"):
+    model.load(dir_path + "/Entrenamiento/model.tflearn")
+    print("Modelo cargado")
+else:
+    model.fit(
+        training,
+        exit,
+        validation_set=0.1,
+        show_metric=True,
+        batch_size=128,
+        n_epoch=1000)
+    model.save("Entrenamiento/model.tflearn")
